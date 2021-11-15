@@ -1,3 +1,8 @@
+import sys
+sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
+from Crypto.Cipher import AES
+from Crypto import Random
+from binascii import b2a_hex
 #from Algorithms.AES import AES
 
 #Assigning Algorithms Numbers :-
@@ -6,6 +11,21 @@
 #2 -> Twofish
 #3 -> TDES
 #4 -> BLOWFISH 
+
+def AESEncrypt(key):
+    plain_text = input("Enter the message : ")
+    print("The key k is: ", key)
+    key = key.encode()
+    # Generate a non-repeatable key vector with a length
+    # equal to the size of the AES block
+    iv = Random.new().read(AES.block_size)
+    # Use key and iv to initialize AES object, use MODE_CFB mode
+    mycipher = AES.new(key, AES.MODE_CFB, iv)
+
+    # Add iv (key vector) to the beginning of the encrypted ciphertext
+    # and transmit it together
+    ciphertext = iv + mycipher.encrypt(plain_text.encode())
+    print("The encrypted data is: ", b2a_hex(ciphertext)[16:])
 
 def compute(a,m,n):
     y=1
@@ -58,6 +78,7 @@ if(algonumber == '0'):
     print("e = ",e)
     RSAencryption(int(n),int(e))
 
-# elif(algonumber == 1):
-#     aes = AES()
-#     aes.Encrypt(key)
+elif(algonumber == '1'):
+    # aes = AES()
+    # aes.Encrypt(key)
+    AESEncrypt(key)

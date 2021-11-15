@@ -9,7 +9,7 @@ class AES_ENCRYPTION:
     def __init__(self):
         # get the plaintext
         self.plain_text = input("Enter the message : ")
-        self.Encrypt('11001110111011011111100110100010001010010101110111001111101011111')
+        self.Encrypt(b'this is a 16 key')
 
     def Encrypt(self,key):
         print("The key k is: ", key)

@@ -1,4 +1,9 @@
 import random
+import sys
+sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
+from Crypto.Cipher import AES
+from Crypto import Random
+from binascii import b2a_hex
 
 #Assigning Algorithms Numbers :-
 #0 -> RSA
@@ -29,6 +34,18 @@ def compute(a,m,n):
         m = m // 2
     return y
 
+def AESdecryption():
+    ciphertext = input("Enter the ciphertext generated : ")
+    ciphertext = bytes(ciphertext, 'ascii')
+    # To decrypt, use key and iv to generate a new AES object
+    mydecrypt = AES.new(key, AES.MODE_CFB, ciphertext[:16])
+
+    # Use the newly generated AES object to decrypt the encrypted ciphertext
+    decrypttext = mydecrypt.decrypt(ciphertext[16:])
+
+    print("iv is: ", b2a_hex(ciphertext)[:16])
+    print("The decrypted data is: ", decrypttext.decode())
+
 def assymetricfinalkey(res):
     n = str(res[0])
     e = str(res[1])
@@ -44,9 +61,15 @@ def assymetricfinalkey(res):
 def  randomize():
     rand=random.randint(40,4000)
     return (rand%2) #Should be %5 but for now we have implemented only 2 algorithms so %2
+
 def symmetrickeygen():
-    for i in range(0,127):
-        return (random.randint(0,1))
+    c=""
+    for i in range(0,16):
+        a=(random.randint(0,9))
+        b=str(a)
+        c=c+b
+    return c
+
 def check_prime(n):
 	for i in range(2,n):
 		if(n%i==0):
@@ -62,12 +85,12 @@ def gcd(a,b):
 def asymmetric():
     while(5):
         p=random.randint(1,1000)
-        while(check_prime(p)==0):
+        while(check_prime(p)==1):
             p=p+1
         break
     while(5):
         q=random.randint(1,1000)
-        while(check_prime(q)==0):
+        while(check_prime(q)==1):
             q=q+1
         break
     n=p*q
@@ -82,6 +105,8 @@ def asymmetric():
     d=(1+(k*phi_n))//e
 
     res = [n,e,d]
+    print("p = ",p)
+    print("q = ",q)
     return res
     # print("n is",n)
     # print("e is",e)
@@ -104,10 +129,12 @@ if algonumber == 0: #Meaning the algorithm is RSA(Assymetric)
     
 else:
     key = str(algonumber)
-    for i in range(0,64):
-        key += str(symmetrickeygen())
+    key += str(symmetrickeygen())
     print("Symmetric Key : ",key)
     print("AlgoNumber : ",algonumber)
+
+    if algonumber == 1:
+        AESdecryption()
 
 
 # for i in range(0,64):
