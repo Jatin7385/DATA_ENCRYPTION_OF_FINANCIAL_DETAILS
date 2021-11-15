@@ -34,9 +34,13 @@ def compute(a,m,n):
         m = m // 2
     return y
 
-def AESdecryption():
+def AESdecryption(key):
+    key = key.encode()
     ciphertext = input("Enter the ciphertext generated : ")
-    ciphertext = bytes(ciphertext, 'ascii')
+    # iv = input("Enter the iv generated : ")
+    ciphertext = ciphertext.encode()
+    # iv = iv.encode()
+    print(ciphertext)
     # To decrypt, use key and iv to generate a new AES object
     mydecrypt = AES.new(key, AES.MODE_CFB, ciphertext[:16])
 
@@ -134,7 +138,7 @@ else:
     print("AlgoNumber : ",algonumber)
 
     if algonumber == 1:
-        AESdecryption()
+        AESdecryption(key[1:])
 
 
 # for i in range(0,64):

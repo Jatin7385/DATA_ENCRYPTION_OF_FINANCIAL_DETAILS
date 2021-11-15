@@ -25,7 +25,8 @@ def AESEncrypt(key):
     # Add iv (key vector) to the beginning of the encrypted ciphertext
     # and transmit it together
     ciphertext = iv + mycipher.encrypt(plain_text.encode())
-    print("The encrypted data is: ", b2a_hex(ciphertext)[16:])
+    #print("iv : ",ciphertext[:16])
+    print("The encrypted data is: ", ciphertext)
 
 def compute(a,m,n):
     y=1
