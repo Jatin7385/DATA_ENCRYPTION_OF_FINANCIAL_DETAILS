@@ -43,10 +43,11 @@ def AESdecryption(key,ciphertext,iv):
     iv = b64decode(iv)
     # print(ciphertext)
     # To decrypt, use key and iv to generate a new AES object
-    mydecrypt = AES.new(key, AES.MODE_CFB, iv)
+    mydecrypt = AES.new(key, AES.MODE_CBC, iv)
 
     # Use the newly generated AES object to decrypt the encrypted ciphertext
     decrypttext = unpad(mydecrypt.decrypt(ciphertext), AES.block_size)
+    #decrypttext = mydecrypt.decrypt(ciphertext)
     print("The decrypted data is: ", decrypttext)
 
 def assymetricfinalkey(res):
@@ -176,9 +177,3 @@ else:
                 iv = row[1]
             csv_file.close()
         AESdecryption(bkey,ciphertext,iv)
-
-
-# for i in range(0,64):
-#     print(symmetrickeygen())
-# print("random",randomize())
-# asymmetric()

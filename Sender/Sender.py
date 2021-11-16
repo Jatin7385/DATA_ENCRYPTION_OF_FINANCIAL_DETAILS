@@ -6,7 +6,6 @@ from Crypto import Random
 from Crypto.Util.Padding import pad
 from binascii import b2a_hex
 import csv
-#from Algorithms.AES import AES
 
 #Assigning Algorithms Numbers :-
 #0 -> RSA
@@ -23,7 +22,7 @@ def AESEncrypt(key):
     # equal to the size of the AES block
     iv = Random.new().read(AES.block_size)
     # Use key and iv to initialize AES object, use MODE_CFB mode
-    mycipher = AES.new(key, AES.MODE_CFB, iv)
+    mycipher = AES.new(key, AES.MODE_CBC, iv)
 
     ciphertext = mycipher.encrypt(pad(plain_text.encode(),AES.block_size))
     #print("iv : ",ciphertext[:16])
@@ -76,7 +75,7 @@ def RSAencryption(n,e):
         with open('ciphertext.csv', 'w', encoding='UTF8') as f:
             writer = csv.writer(f)
 
-            # write the data(cipher,iv)
+            # write the data(cipher)
             writer.writerow(cipher)
 
             f.close()
