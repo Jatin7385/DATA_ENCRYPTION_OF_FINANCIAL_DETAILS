@@ -2,8 +2,12 @@ import random
 import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from base64 import b64decode
 from Crypto import Random
+from Crypto.Random import get_random_bytes
 from binascii import b2a_hex
+import csv
 
 #Assigning Algorithms Numbers :-
 #0 -> RSA
@@ -12,10 +16,8 @@ from binascii import b2a_hex
 #3 -> TDES
 #4 -> BLOWFISH 
 
-def RSAdecryption(n,d):
+def RSAdecryption(n,d,a):
     M=[]
-    C=input("Enter the Text to Decrypt:")
-    a=C.split()
     for i in a:
         M.append(compute(int(i),d,n))
     print("Decrypted text is :-")
@@ -34,31 +36,29 @@ def compute(a,m,n):
         m = m // 2
     return y
 
-def AESdecryption(key):
-    key = key.encode()
-    ciphertext = input("Enter the ciphertext generated : ")
+def AESdecryption(key,ciphertext,iv):            
+    # ciphertext = input("Enter the ciphertext generated : ")
     # iv = input("Enter the iv generated : ")
-    ciphertext = ciphertext.encode()
-    # iv = iv.encode()
-    print(ciphertext)
+    ciphertext = b64decode(ciphertext)
+    iv = b64decode(iv)
+    # print(ciphertext)
     # To decrypt, use key and iv to generate a new AES object
-    mydecrypt = AES.new(key, AES.MODE_CFB, ciphertext[:16])
+    mydecrypt = AES.new(key, AES.MODE_CFB, iv)
 
     # Use the newly generated AES object to decrypt the encrypted ciphertext
-    decrypttext = mydecrypt.decrypt(ciphertext[16:])
-
-    print("iv is: ", b2a_hex(ciphertext)[:16])
-    print("The decrypted data is: ", decrypttext.decode())
+    decrypttext = unpad(mydecrypt.decrypt(ciphertext), AES.block_size)
+    print("The decrypted data is: ", decrypttext)
 
 def assymetricfinalkey(res):
     n = str(res[0])
     e = str(res[1])
     nsize = len(n)
     esize = len(e)
-    print("ASSYMETRIC : ",n,e,nsize,esize)
+    print("ASSYMETRIC : n e nsize esize",n,e,nsize,esize)
     key = str(nsize) + n + str(esize) + e
     print("n = ",n)
     print("e = ",e)
+    print("Key Format : algonumber + nsize + n + esize + e")
     return key
 
 
@@ -124,21 +124,58 @@ if algonumber == 0: #Meaning the algorithm is RSA(Assymetric)
     key += assymetricfinalkey(res)
     d = res[2]
     n = res[0]
+    keys = [key]
     print("Assymetric Key : ",key)
     print("Algo Number : ",algonumber)
 
+    with open('key.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the data(cipher,iv)
+        writer.writerow(keys)
+
+        f.close()
+
     print("DECRYPTION OF RSA")
-    RSAdecryption(int(n),int(d))
+    input("Please Enter when ciphertext generated : ")
+    with open("C:\\Users\\Jatin Dhall\\Desktop\\Desktop File\\VIT\\VIT\\SEM 3\\Cyber Security\\PROJECT\\PROJECT\\Sender\\ciphertext.csv") as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if(len(row) == 0):
+                break
+            ciphertext = row
+        csv_file.close()
+    RSAdecryption(int(n),int(d),ciphertext)
 
     
 else:
+    bkey = get_random_bytes(16)
     key = str(algonumber)
     key += str(symmetrickeygen())
+
+    keys = [key]
+    with open('key.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the data(cipher,iv)
+        writer.writerow(keys)
+
+        f.close()
+    # key += str(bkey)
     print("Symmetric Key : ",key)
     print("AlgoNumber : ",algonumber)
 
     if algonumber == 1:
-        AESdecryption(key[1:])
+        input("Please Enter when ciphertext generated : ")
+        with open("C:\\Users\\Jatin Dhall\\Desktop\\Desktop File\\VIT\\VIT\\SEM 3\\Cyber Security\\PROJECT\\PROJECT\\Sender\\ciphertext.csv") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                if(len(row) == 0):
+                    break
+                ciphertext = row[0]
+                iv = row[1]
+            csv_file.close()
+        AESdecryption(bkey,ciphertext,iv)
 
 
 # for i in range(0,64):
