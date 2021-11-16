@@ -4,6 +4,7 @@ sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from base64 import b64decode
+from base64 import b64encode
 from Crypto import Random
 from Crypto.Random import get_random_bytes
 from binascii import b2a_hex
@@ -37,11 +38,11 @@ def compute(a,m,n):
     return y
 
 def AESdecryption(key,ciphertext,iv):            
-    # ciphertext = input("Enter the ciphertext generated : ")
-    # iv = input("Enter the iv generated : ")
     ciphertext = b64decode(ciphertext)
     iv = b64decode(iv)
-    # print(ciphertext)
+
+    print("Decoded ciphertext : ",ciphertext,len(ciphertext))
+    print("Decoded iv : ",iv,len(iv))
     # To decrypt, use key and iv to generate a new AES object
     mydecrypt = AES.new(key, AES.MODE_CBC, iv)
 
@@ -66,14 +67,6 @@ def assymetricfinalkey(res):
 def  randomize():
     rand=random.randint(40,4000)
     return (rand%2) #Should be %5 but for now we have implemented only 2 algorithms so %2
-
-def symmetrickeygen():
-    c=""
-    for i in range(0,16):
-        a=(random.randint(0,9))
-        b=str(a)
-        c=c+b
-    return c
 
 def check_prime(n):
 	for i in range(2,n):
@@ -152,7 +145,8 @@ if algonumber == 0: #Meaning the algorithm is RSA(Assymetric)
 else:
     bkey = get_random_bytes(16)
     key = str(algonumber)
-    key += str(symmetrickeygen())
+    bkey1 = b64encode(bkey).decode('utf-8')
+    key += bkey1
 
     keys = [key]
     with open('key.csv', 'w', encoding='UTF8') as f:
@@ -162,7 +156,6 @@ else:
         writer.writerow(keys)
 
         f.close()
-    # key += str(bkey)
     print("Symmetric Key : ",key)
     print("AlgoNumber : ",algonumber)
 

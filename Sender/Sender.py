@@ -2,6 +2,7 @@ import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
 from base64 import b64encode
+from base64 import b64decode
 from Crypto import Random
 from Crypto.Util.Padding import pad
 from binascii import b2a_hex
@@ -16,16 +17,14 @@ import csv
 
 def AESEncrypt(key):
     plain_text = input("Enter the message : ")
-    print("The key k is: ", key)
-    key = key.encode()
+    plain_text = plain_text.encode()
     # Generate a non-repeatable key vector with a length
     # equal to the size of the AES block
     iv = Random.new().read(AES.block_size)
-    # Use key and iv to initialize AES object, use MODE_CFB mode
+    # Use key and iv to initialize AES object, use MODE_CBC mode
     mycipher = AES.new(key, AES.MODE_CBC, iv)
 
-    ciphertext = mycipher.encrypt(pad(plain_text.encode(),AES.block_size))
-    #print("iv : ",ciphertext[:16])
+    ciphertext = mycipher.encrypt(pad(plain_text,AES.block_size))
     print("The encrypted data is:", b64encode(ciphertext).decode('utf-8'))
     print("The iv is:", b64encode(iv).decode('utf-8'))
     cipher = [b64encode(ciphertext).decode('utf-8'),b64encode(iv).decode('utf-8')]
@@ -110,6 +109,6 @@ if(algonumber == '0'):
     RSAencryption(int(n),int(e))
 
 elif(algonumber == '1'):
-    # aes = AES()
-    # aes.Encrypt(key)
+    key = b64decode(key)
+    print("KEY :",key)
     AESEncrypt(key)
