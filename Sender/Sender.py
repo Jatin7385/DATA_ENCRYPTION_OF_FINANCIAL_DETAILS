@@ -1,6 +1,7 @@
 import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
+from Crypto.Cipher import DES3
 from base64 import b64encode
 from base64 import b64decode
 from Crypto import Random
@@ -11,8 +12,8 @@ import csv
 #Assigning Algorithms Numbers :-
 #0 -> RSA
 #1 -> AES
-#2 -> Twofish
-#3 -> TDES
+#2 -> TDES
+#3 -> Twofish
 #4 -> BLOWFISH 
 
 def AESEncrypt(key):
@@ -37,6 +38,19 @@ def AESEncrypt(key):
 
         f.close()
 
+
+def tripledesencrypt(bkey):
+    msg=input("Enter the plaintext : ")
+    key = pad(bkey,24)
+    tdes_key = DES3.adjust_key_parity(key)
+    cipher = DES3.new(tdes_key,DES3.MODE_EAX, nonce=b'0')
+    ciphertext = cipher.encrypt(msg.encode('utf-8'))
+    print("Encrypted text :-", ciphertext)
+    cipher = [b64encode(ciphertext).decode('utf-8')]
+    with open('ciphertext.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(cipher)
+        f.close()
 
 def compute(a,m,n):
     y=1
@@ -112,3 +126,8 @@ elif(algonumber == '1'):
     key = b64decode(key)
     print("KEY :",key)
     AESEncrypt(key)
+
+elif(algonumber == '2'):
+    key = b64decode(key)
+    print("KEY :",key)
+    tripledesencrypt(key)

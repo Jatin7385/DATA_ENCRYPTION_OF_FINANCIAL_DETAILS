@@ -2,19 +2,21 @@ import random
 import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
+from Crypto.Cipher import DES3
 from Crypto.Util.Padding import unpad
 from base64 import b64decode
 from base64 import b64encode
 from Crypto import Random
 from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad
 from binascii import b2a_hex
 import csv
 
 #Assigning Algorithms Numbers :-
 #0 -> RSA
 #1 -> AES
-#2 -> Twofish
-#3 -> TDES
+#2 -> TDES
+#3 -> Twofish
 #4 -> BLOWFISH 
 
 def RSAdecryption(n,d,a):
@@ -51,6 +53,15 @@ def AESdecryption(key,ciphertext,iv):
     #decrypttext = mydecrypt.decrypt(ciphertext)
     print("The decrypted data is: ", decrypttext)
 
+
+def tripledesdecrypt(ciphertext,bkey):
+    key = pad(bkey, 24)
+    tdes_key = DES3.adjust_key_parity(key)
+    cipher = DES3.new(tdes_key, DES3.MODE_EAX, nonce=b'0')
+    ciphertext = b64decode(ciphertext)
+    plaintext=cipher.decrypt(ciphertext)
+    print("Decrypted Text : ",plaintext.decode('utf-8'))
+
 def assymetricfinalkey(res):
     n = str(res[0])
     e = str(res[1])
@@ -66,7 +77,7 @@ def assymetricfinalkey(res):
 
 def  randomize():
     rand=random.randint(40,4000)
-    return (rand%2) #Should be %5 but for now we have implemented only 2 algorithms so %2
+    return (rand%3)
 
 def check_prime(n):
 	for i in range(2,n):
@@ -111,7 +122,8 @@ def asymmetric():
     # print("d is",d)
     
 
-algonumber = randomize()
+# algonumber = randomize()
+algonumber = 2
 if algonumber == 0: #Meaning the algorithm is RSA(Assymetric)
     key = str(algonumber)
     res = asymmetric()
@@ -159,14 +171,18 @@ else:
     print("Symmetric Key : ",key)
     print("AlgoNumber : ",algonumber)
 
-    if algonumber == 1:
-        input("Please Enter when ciphertext generated : ")
-        with open("C:\\Users\\Jatin Dhall\\Desktop\\Desktop File\\VIT\\VIT\\SEM 3\\Cyber Security\\PROJECT\\PROJECT\\Sender\\ciphertext.csv") as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            for row in csv_reader:
-                if(len(row) == 0):
-                    break
-                ciphertext = row[0]
+    input("Please Enter when ciphertext generated : ")
+    with open("C:\\Users\\Jatin Dhall\\Desktop\\Desktop File\\VIT\\VIT\\SEM 3\\Cyber Security\\PROJECT\\PROJECT\\Sender\\ciphertext.csv") as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if(len(row) == 0):
+                break
+            ciphertext = row[0]
+            if algonumber!=2:
                 iv = row[1]
-            csv_file.close()
+        csv_file.close()
+
+    if algonumber == 1: #AES
         AESdecryption(bkey,ciphertext,iv)
+    elif algonumber == 2: #TDES
+        tripledesdecrypt(ciphertext,bkey)
