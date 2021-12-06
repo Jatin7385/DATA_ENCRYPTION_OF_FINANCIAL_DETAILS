@@ -3,6 +3,9 @@ import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
 from Crypto.Cipher import DES3
+from Crypto.Cipher import CAST
+import blowfish
+from os import urandom
 from Crypto.Util.Padding import unpad
 from base64 import b64decode
 from base64 import b64encode
@@ -16,8 +19,9 @@ import csv
 #0 -> RSA
 #1 -> AES
 #2 -> TDES
-#3 -> Twofish
-#4 -> BLOWFISH 
+#3 -> BLOWFISH
+#4 -> CAST
+
 
 def RSAdecryption(n,d,a):
     M=[]
@@ -39,6 +43,17 @@ def compute(a,m,n):
         m = m // 2
     return y
 
+def CASTdecryption(key,ciphertext,eiv):
+    ciphertext = b64decode(ciphertext)
+    eiv = b64decode(eiv)
+
+    print("Decoded ciphertext : ",ciphertext,len(ciphertext))
+    print("Decoded iv : ",eiv,len(eiv))
+    cipher = CAST.new(key, CAST.MODE_OPENPGP, eiv)
+    decryptedText = cipher.decrypt(ciphertext)
+
+    print("Decrypted data is : ",decryptedText)
+
 def AESdecryption(key,ciphertext,iv):            
     ciphertext = b64decode(ciphertext)
     iv = b64decode(iv)
@@ -53,6 +68,16 @@ def AESdecryption(key,ciphertext,iv):
     #decrypttext = mydecrypt.decrypt(ciphertext)
     print("The decrypted data is: ", decrypttext)
 
+def blowfishdecrypt(key,ciphertext,iv):
+    ciphertext = b64decode(ciphertext)
+    iv = b64decode(iv)
+
+    print("Decoded ciphertext : ",ciphertext,len(ciphertext))
+    print("Decoded iv : ",iv,len(iv))
+    cipher = blowfish.Cipher(key)
+    data_decrypted = b"".join(cipher.decrypt_cbc(ciphertext, iv))
+    decrypttext=data_decrypted.decode()
+    print("The decryped data is : ",decrypttext)
 
 def tripledesdecrypt(ciphertext,bkey):
     key = pad(bkey, 24)
@@ -123,7 +148,7 @@ def asymmetric():
     
 
 # algonumber = randomize()
-algonumber = 2
+algonumber = 4
 if algonumber == 0: #Meaning the algorithm is RSA(Assymetric)
     key = str(algonumber)
     res = asymmetric()
@@ -186,3 +211,7 @@ else:
         AESdecryption(bkey,ciphertext,iv)
     elif algonumber == 2: #TDES
         tripledesdecrypt(ciphertext,bkey)
+    elif algonumber == 3: #Blowwfish
+        blowfishdecrypt(bkey,ciphertext,iv)
+    elif algonumber == 4: #CAST
+        CASTdecryption(bkey,ciphertext,iv)

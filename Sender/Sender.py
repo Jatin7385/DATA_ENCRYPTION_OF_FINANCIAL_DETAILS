@@ -2,6 +2,9 @@ import sys
 sys.path.append("c:\\users\\jatin dhall\\anaconda3\\lib\\site-packages")
 from Crypto.Cipher import AES
 from Crypto.Cipher import DES3
+from Crypto.Cipher import CAST
+import blowfish
+from os import urandom
 from base64 import b64encode
 from base64 import b64decode
 from Crypto import Random
@@ -13,9 +16,47 @@ import csv
 #0 -> RSA
 #1 -> AES
 #2 -> TDES
-#3 -> Twofish
-#4 -> BLOWFISH 
+#3 -> BLOWFISH
+#4 -> CAST 
 
+def BlowfishEncrypt(key):
+    cipher = blowfish.Cipher(key)
+    iv = urandom(8) # initialization vector
+    data=input('Enter the Data to encrypt:')
+    while((len(data)%8)!=0):
+        data=data+" "
+    res = data.encode('utf-8')
+    print("Data to encrypt",data)
+    ciphertext = b"".join(cipher.encrypt_cbc(res, iv))
+    print("encrypted data",ciphertext)
+    cipher = [b64encode(ciphertext).decode('utf-8'),b64encode(iv).decode('utf-8')]
+
+    with open('ciphertext.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the data(cipher,iv)
+        writer.writerow(cipher)
+
+        f.close()
+
+def CASTEncrypt(key):
+    cipher = CAST.new(key, CAST.MODE_OPENPGP)
+    plaintext = input("Enter the message : ")
+    plaintext = plaintext.encode()
+    msg = cipher.encrypt(plaintext)
+    eiv = msg[:CAST.block_size+2]
+    ciphertext = msg[CAST.block_size+2:]
+    print("The encrypted data is:", b64encode(ciphertext).decode('utf-8'))
+    print("The iv is:", b64encode(eiv).decode('utf-8'))
+    cipher = [b64encode(ciphertext).decode('utf-8'),b64encode(eiv).decode('utf-8')]
+
+    with open('ciphertext.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the data(cipher,iv)
+        writer.writerow(cipher)
+
+        f.close()
 def AESEncrypt(key):
     plain_text = input("Enter the message : ")
     plain_text = plain_text.encode()
@@ -131,3 +172,13 @@ elif(algonumber == '2'):
     key = b64decode(key)
     print("KEY :",key)
     tripledesencrypt(key)
+
+elif(algonumber == '3'):
+    key = b64decode(key)
+    print("KEY :",key)
+    BlowfishEncrypt(key)
+
+elif(algonumber == '4'):
+    key = b64decode(key)
+    print("KEY :",key)
+    CASTEncrypt(key)
